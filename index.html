@@ -1,14 +1,184 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/calculator/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Vite + React</title>
-    <script type="module" crossorigin src="/calculator/assets/index-CtrSBazf.js"></script>
-    <link rel="stylesheet" crossorigin href="/calculator/assets/index-abdHfJVn.css">
-  </head>
-  <body>
-    <div id="root"></div>
-  </body>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+    <link rel="manifest" href="/calculator/manifest.json">
+    <meta name="theme-color" content="#f0f4f8">
+
+    <title>Cost Calculator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 5px;
+            background: #f0f4f8;
+            color: #222;
+        }
+        h3 {
+            text-align: center;
+            font-size: 1.3rem;
+            margin-bottom: 20px;
+        }
+        .grid {
+            display: grid;
+            gap: 10px;
+        }
+        /* Big row card */
+        .row-card {
+            background: #fff;
+            padding: 5px;
+            border-radius: 6px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        /* Two columns inside row */
+        .two-col {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 5px;
+        }
+        /* Inner sub-box */
+        .card {
+
+            padding: 5px;
+            border-radius: 6px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+        label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 10px;
+            font-size: 1rem;
+            text-align: center;
+        }
+        input {
+            width: 90%;
+            padding: 6px;
+            font-size: 1.5rem;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        p {
+            margin: 0;
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #444;
+            text-align: center;
+        }
+        .hidden {
+            display: none;
+        }
+        .one{
+            background-color: lightblue;
+        }
+        .two{
+            background-color: lightpink;
+        }
+        .three{
+            background-color: lightyellow;
+        }
+
+    </style>
+</head>
+<body>
+<h3>Cost Calculator</h3>
+
+<div class="grid">
+
+    <!-- Row 1 -->
+    <div class="row-card one">
+        <div class="two-col">
+            <div class="card">
+                <label for="kgCost" style="color: darkblue;">Cost for 1 kg</label>
+                <input type="number"  inputmode="numeric"  pattern="[0-9]*"  id="kgCost" oninput="updateCosts()">
+            </div>
+            <div class="card">
+                <label style="color: darkblue;">Cost per gram</label>
+                <p id="costPerGram"></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Row 2 -->
+    <div class="row-card hidden two" id="rowGrams">
+        <div class="two-col">
+            <div class="card">
+                <label for="gramsInput" style="color: royalblue;">Enter grams:</label>
+                <input type="number"  inputmode="numeric"  pattern="[0-9]*"  id="gramsInput" oninput="updateCosts()">
+            </div>
+            <div class="card">
+                <label style="color: royalblue;">Cost for grams</label>
+                <p id="costForGrams"></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Row 3 -->
+    <div class="row-card hidden three" id="rowAmount">
+        <div class="two-col">
+            <div class="card">
+                <label for="amountInput" style="color: seagreen;">Enter amount:</label>
+                <input type="number"  inputmode="numeric"  pattern="[0-9]*"  id="amountInput" oninput="updateCosts()">
+            </div>
+            <div class="card">
+                <label style="color: seagreen;">Grams for amount</label>
+                <p id="gramsForAmount"></p>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    function updateCosts() {
+        const kgCost = parseFloat(document.getElementById('kgCost').value);
+        const grams = parseFloat(document.getElementById('gramsInput').value);
+        const amount = parseFloat(document.getElementById('amountInput').value);
+
+        const costPerGramElement = document.getElementById('costPerGram');
+        const costForGramsElement = document.getElementById('costForGrams');
+        const gramsForAmountElement = document.getElementById('gramsForAmount');
+
+        const rowGrams = document.getElementById('rowGrams');
+        const rowAmount = document.getElementById('rowAmount');
+
+        if (!isNaN(kgCost) && kgCost > 0) {
+            rowGrams.classList.remove('hidden');
+            rowAmount.classList.remove('hidden');
+
+            const costPerGram = kgCost / 1000;
+            costPerGramElement.textContent = costPerGram.toFixed(2);
+
+            if (!isNaN(grams) && grams > 0) {
+                const costForGrams = costPerGram * grams;
+                costForGramsElement.textContent = costForGrams.toFixed(2);
+            } else {
+                costForGramsElement.textContent = "";
+            }
+
+            if (!isNaN(amount) && amount > 0) {
+                const gramsForAmount = amount / costPerGram;
+                gramsForAmountElement.textContent = gramsForAmount.toFixed(2);
+            } else {
+                gramsForAmountElement.textContent = "";
+            }
+        } else {
+            costPerGramElement.textContent = "";
+            costForGramsElement.textContent = "";
+            gramsForAmountElement.textContent = "";
+
+            rowGrams.classList.add('hidden');
+            rowAmount.classList.add('hidden');
+        }
+    }
+</script>
+</body>
 </html>
