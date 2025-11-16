@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AES Encrypt/Decrypt</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f4f4f4;
+        }
+        .container {
+            text-align: center;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        input, button {
+            margin: 10px;
+            padding: 10px;
+            width: 80%;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>AES Encrypt and Decrypt</h2>
+    <input type="text" id="userInput" placeholder="Enter text to encrypt">
+    <br>
+    <input type="password" id="aesKey" placeholder="Enter secret key">
+    <br>
+    <button onclick="encryptAES()">Encrypt</button>
+    <button onclick="decryptAES()">Decrypt</button>
+    <br>
+    <h4>Result:</h4>
+    <p id="output"></p>
+    <button id="copyButton" onclick="copyToClipboard()" style="display: none;">Copy Result</button>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+
+<script>
+    // Encrypt with AES
+    function encryptAES() {
+        const text = document.getElementById("userInput").value;
+        const key = document.getElementById("aesKey").value;
+        const encrypted = CryptoJS.AES.encrypt(text, key).toString();
+        document.getElementById("output").textContent = encrypted;
+        document.getElementById("copyButton").style.display = 'inline';  // Show copy button
+    }
+
+    // Decrypt with AES
+    function decryptAES() {
+        const text = document.getElementById("userInput").value;
+        const key = document.getElementById("aesKey").value;
+        const decrypted = CryptoJS.AES.decrypt(text, key);
+        const originalText = decrypted.toString(CryptoJS.enc.Utf8);
+        document.getElementById("output").textContent = originalText;
+        document.getElementById("copyButton").style.display = 'inline';  // Show copy button
+    }
+
+    // Copy to Clipboard function
+    function copyToClipboard() {
+        const resultText = document.getElementById("output").textContent;
+        const tempInput = document.createElement("input");
+        tempInput.value = resultText;
+        document.body.appendChild(tempInput);
+        tempInput.select();
+        document.execCommand("copy");
+        document.body.removeChild(tempInput);
+        alert("Result copied to clipboard!");
+    }
+</script>
+
+</body>
+</html>
