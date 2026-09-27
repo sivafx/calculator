@@ -1,184 +1,330 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Shiva Price Calculator</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f6f4ef;
+    --ink: #201d18;
+    --ink-soft: #8a8478;
+    --card: #ffffff;
+    --line: #e7e2d8;
+    --p1: #201d18;
+    --p2: #0f6b4f;
+    --p2-bg: #e3f1ea;
+    --p3: #a15a00;
+    --p3-bg: #fbedd8;
+    box-sizing: border-box;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #14130f;
+      --ink: #f3f0e8;
+      --ink-soft: #8f897c;
+      --card: #1d1c17;
+      --line: #322f27;
+      --p1: #f3f0e8;
+      --p2: #4fd6a6;
+      --p2-bg: #14261f;
+      --p3: #f0b45f;
+      --p3-bg: #2a2013;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #14130f;
+    --ink: #f3f0e8;
+    --ink-soft: #8f897c;
+    --card: #1d1c17;
+    --line: #322f27;
+    --p1: #f3f0e8;
+    --p2: #4fd6a6;
+    --p2-bg: #14261f;
+    --p3: #f0b45f;
+    --p3-bg: #2a2013;
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; margin: 0; }
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'IBM Plex Sans', Arial, Helvetica, sans-serif;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
 
-    <link rel="manifest" href="/calculator/manifest.json">
-    <meta name="theme-color" content="#f0f4f8">
+  header {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 16px 8px;
+  }
+  .brand {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+  }
+  .brand-mark {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--p2);
+    flex: none;
+  }
+  h1 {
+    margin: 0;
+    font-size: clamp(1rem, 4vw, 1.3rem);
+    font-weight: 700;
+    letter-spacing: -0.01em;
+  }
+  .clear-btn {
+    border: 1.5px solid var(--line);
+    background: var(--card);
+    color: var(--ink-soft);
+    font-size: 0.82rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    padding: 8px 14px;
+    border-radius: 100px;
+  }
+  .clear-btn:active { background: var(--line); }
 
-    <title>Cost Calculator</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 5px;
-            background: #f0f4f8;
-            color: #222;
-        }
-        h3 {
-            text-align: center;
-            font-size: 1.3rem;
-            margin-bottom: 20px;
-        }
-        .grid {
-            display: grid;
-            gap: 10px;
-        }
-        /* Big row card */
-        .row-card {
-            background: #fff;
-            padding: 5px;
-            border-radius: 6px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-        }
-        /* Two columns inside row */
-        .two-col {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 5px;
-        }
-        /* Inner sub-box */
-        .card {
+  .panels {
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 2px 12px 12px;
+    min-height: 0;
+  }
+  .panel {
+    flex: 1 1 0;
+    min-height: 0;
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 22px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 8px 18px;
+    position: relative;
+  }
+  .panel.p2 { background: var(--p2-bg); border-color: transparent; }
+  .panel.p3 { background: var(--p3-bg); border-color: transparent; }
 
-            padding: 5px;
-            border-radius: 6px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-        }
-        label {
-            display: block;
-            font-weight: bold;
-            margin-bottom: 10px;
-            font-size: 1rem;
-            text-align: center;
-        }
-        input {
-            width: 90%;
-            padding: 6px;
-            font-size: 1.5rem;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-        }
-        p {
-            margin: 0;
-            font-size: 2.5rem;
-            font-weight: bold;
-            color: #444;
-            text-align: center;
-        }
-        .hidden {
-            display: none;
-        }
-        .one{
-            background-color: lightblue;
-        }
-        .two{
-            background-color: lightpink;
-        }
-        .three{
-            background-color: lightyellow;
-        }
+  .panel-tag {
+    font-size: clamp(0.72rem, 2.6vw, 0.85rem);
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    text-align: center;
+    margin-bottom: 2px;
+  }
+  .panel.p1 .panel-tag { color: var(--ink-soft); }
+  .panel.p2 .panel-tag { color: var(--p2); }
+  .panel.p3 .panel-tag { color: var(--p3); }
 
-    </style>
+  .io-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    flex: 1 1 0;
+    min-height: 0;
+  }
+  .rupee {
+    font-size: clamp(1.5rem, 7vw, 2.6rem);
+    font-weight: 600;
+    opacity: 0.4;
+  }
+  .panel.p1 .rupee { color: var(--p1); }
+  .panel.p2 .rupee { color: var(--p2); }
+  .panel.p3 .rupee { color: var(--p3); }
+
+  input[type="number"] {
+    width: 100%;
+    max-width: 280px;
+    height: 100%;
+    max-height: 110px;
+    border: none;
+    background: transparent;
+    font-family: 'IBM Plex Sans', Arial, Helvetica, sans-serif;
+    font-size: clamp(2.1rem, 11vw, 3.8rem);
+    font-weight: 700;
+    text-align: center;
+    -moz-appearance: textfield;
+  }
+  .panel.p1 input { color: var(--p1); }
+  .panel.p2 input { color: var(--p2); }
+  .panel.p3 input { color: var(--p3); }
+  input[type="number"]::-webkit-outer-spin-button,
+  input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  input::placeholder { color: var(--line); }
+  input:focus { outline: none; }
+  input:focus-visible {
+    outline: 2.5px solid currentColor;
+    outline-offset: 6px;
+    border-radius: 12px;
+  }
+
+  .result {
+    font-size: clamp(2.1rem, 11vw, 3.8rem);
+    font-weight: 700;
+    text-align: center;
+    width: 100%;
+    line-height: 1;
+  }
+  .panel.p2 .result { color: var(--p2); }
+  .panel.p3 .result { color: var(--p3); }
+  .result.empty { opacity: 0.28; }
+
+  .panel.p1 {
+    flex: 1 1 0;
+  }
+  .pergram-line {
+    display: flex;
+    align-items: baseline;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 4px;
+  }
+  .pergram-label {
+    font-size: clamp(0.8rem, 3vw, 1rem);
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    color: var(--ink-soft);
+  }
+  .pergram-value {
+    font-size: clamp(1.3rem, 6vw, 2rem);
+    font-weight: 700;
+    color: var(--ink-soft);
+  }
+  .pergram-value.empty { opacity: 0.28; }
+</style>
 </head>
 <body>
-<h3>Cost Calculator</h3>
+<header>
+  <div class="brand">
+    <span class="brand-mark" aria-hidden="true"></span>
+    <h1>Shiva Price Calculator</h1>
+  </div>
+  <button class="clear-btn" id="resetBtn" type="button">CLEAR</button>
+</header>
 
-<div class="grid">
+<div class="panels">
 
-    <!-- Row 1 -->
-    <div class="row-card one">
-        <div class="two-col">
-            <div class="card">
-                <label for="kgCost" style="color: darkblue;">Cost for 1 kg</label>
-                <input type="number"  inputmode="numeric"  pattern="[0-9]*"  id="kgCost" oninput="updateCosts()">
-            </div>
-            <div class="card">
-                <label style="color: darkblue;">Cost per gram</label>
-                <p id="costPerGram"></p>
-            </div>
-        </div>
+  <div class="panel p1">
+    <div class="panel-tag">PRICE PER KG</div>
+    <div class="io-row">
+      <span class="rupee">₹</span>
+      <input type="number" inputmode="decimal" id="kgCost" placeholder="0" autocomplete="off">
     </div>
-
-    <!-- Row 2 -->
-    <div class="row-card hidden two" id="rowGrams">
-        <div class="two-col">
-            <div class="card">
-                <label for="gramsInput" style="color: royalblue;">Enter grams:</label>
-                <input type="number"  inputmode="numeric"  pattern="[0-9]*"  id="gramsInput" oninput="updateCosts()">
-            </div>
-            <div class="card">
-                <label style="color: royalblue;">Cost for grams</label>
-                <p id="costForGrams"></p>
-            </div>
-        </div>
+    <div class="pergram-line">
+      <span class="pergram-label">PER GRAM</span>
+      <span class="pergram-value empty" id="perGramNote">₹ —</span>
     </div>
+  </div>
 
-    <!-- Row 3 -->
-    <div class="row-card hidden three" id="rowAmount">
-        <div class="two-col">
-            <div class="card">
-                <label for="amountInput" style="color: seagreen;">Enter amount:</label>
-                <input type="number"  inputmode="numeric"  pattern="[0-9]*"  id="amountInput" oninput="updateCosts()">
-            </div>
-            <div class="card">
-                <label style="color: seagreen;">Grams for amount</label>
-                <p id="gramsForAmount"></p>
-            </div>
-        </div>
+  <div class="panel p2">
+    <div class="panel-tag">WEIGHT (GRAMS) → COST</div>
+    <div class="io-row">
+      <input type="number" inputmode="decimal" id="gramsInput" placeholder="0" autocomplete="off">
     </div>
+    <div class="result empty" id="costForGrams">₹ —</div>
+  </div>
+
+  <div class="panel p3">
+    <div class="panel-tag">AMOUNT (₹) → WEIGHT</div>
+    <div class="io-row">
+      <span class="rupee">₹</span>
+      <input type="number" inputmode="decimal" id="amountInput" placeholder="0" autocomplete="off">
+    </div>
+    <div class="result empty" id="gramsForAmount">—</div>
+  </div>
 
 </div>
 
 <script>
-    function updateCosts() {
-        const kgCost = parseFloat(document.getElementById('kgCost').value);
-        const grams = parseFloat(document.getElementById('gramsInput').value);
-        const amount = parseFloat(document.getElementById('amountInput').value);
+(function () {
+  const kgCost = document.getElementById('kgCost');
+  const grams = document.getElementById('gramsInput');
+  const amount = document.getElementById('amountInput');
 
-        const costPerGramElement = document.getElementById('costPerGram');
-        const costForGramsElement = document.getElementById('costForGrams');
-        const gramsForAmountElement = document.getElementById('gramsForAmount');
+  const perGramNote = document.getElementById('perGramNote');
+  const costForGramsEl = document.getElementById('costForGrams');
+  const gramsForAmountEl = document.getElementById('gramsForAmount');
+  const resetBtn = document.getElementById('resetBtn');
 
-        const rowGrams = document.getElementById('rowGrams');
-        const rowAmount = document.getElementById('rowAmount');
+  const fmt = (n) => n.toLocaleString('en-IN', { maximumFractionDigits: 2 });
 
-        if (!isNaN(kgCost) && kgCost > 0) {
-            rowGrams.classList.remove('hidden');
-            rowAmount.classList.remove('hidden');
-
-            const costPerGram = kgCost / 1000;
-            costPerGramElement.textContent = costPerGram.toFixed(2);
-
-            if (!isNaN(grams) && grams > 0) {
-                const costForGrams = costPerGram * grams;
-                costForGramsElement.textContent = costForGrams.toFixed(2);
-            } else {
-                costForGramsElement.textContent = "";
-            }
-
-            if (!isNaN(amount) && amount > 0) {
-                const gramsForAmount = amount / costPerGram;
-                gramsForAmountElement.textContent = gramsForAmount.toFixed(2);
-            } else {
-                gramsForAmountElement.textContent = "";
-            }
-        } else {
-            costPerGramElement.textContent = "";
-            costForGramsElement.textContent = "";
-            gramsForAmountElement.textContent = "";
-
-            rowGrams.classList.add('hidden');
-            rowAmount.classList.add('hidden');
-        }
+  function setResult(el, text) {
+    if (text === null) {
+      el.textContent = '—';
+      el.classList.add('empty');
+    } else {
+      el.textContent = text;
+      el.classList.remove('empty');
     }
+  }
+
+  function setPerGram(text) {
+    if (text === null) {
+      perGramNote.textContent = '₹ —';
+      perGramNote.classList.add('empty');
+    } else {
+      perGramNote.textContent = text;
+      perGramNote.classList.remove('empty');
+    }
+  }
+
+  function update() {
+    const kc = parseFloat(kgCost.value);
+    const g = parseFloat(grams.value);
+    const a = parseFloat(amount.value);
+
+    if (!isNaN(kc) && kc > 0) {
+      const perGram = kc / 1000;
+      setPerGram('₹' + fmt(perGram));
+
+      setResult(costForGramsEl, (!isNaN(g) && g > 0) ? '₹' + fmt(perGram * g) : null);
+      setResult(gramsForAmountEl, (!isNaN(a) && a > 0) ? fmt(a / perGram) + ' g' : null);
+
+      try { localStorage.setItem('rc_kgCost', kgCost.value); } catch (e) {}
+    } else {
+      setPerGram(null);
+      setResult(costForGramsEl, null);
+      setResult(gramsForAmountEl, null);
+    }
+  }
+
+  [kgCost, grams, amount].forEach(el => el.addEventListener('input', update));
+
+  resetBtn.addEventListener('click', function () {
+    kgCost.value = '';
+    grams.value = '';
+    amount.value = '';
+    try { localStorage.removeItem('rc_kgCost'); } catch (e) {}
+    update();
+  });
+
+  try {
+    const saved = localStorage.getItem('rc_kgCost');
+    if (saved) kgCost.value = saved;
+  } catch (e) {}
+
+  update();
+})();
 </script>
 </body>
 </html>
