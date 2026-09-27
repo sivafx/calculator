@@ -15,6 +15,7 @@
     --card: #ffffff;
     --line: #e7e2d8;
     --p1: #201d18;
+    --p1-bg: #e9e4d8;
     --p2: #0f6b4f;
     --p2-bg: #e3f1ea;
     --p3: #a15a00;
@@ -31,6 +32,7 @@
       --card: #1d1c17;
       --line: #322f27;
       --p1: #f3f0e8;
+      --p1-bg: #262319;
       --p2: #4fd6a6;
       --p2-bg: #14261f;
       --p3: #f0b45f;
@@ -44,6 +46,7 @@
     --card: #1d1c17;
     --line: #322f27;
     --p1: #f3f0e8;
+    --p1-bg: #262319;
     --p2: #4fd6a6;
     --p2-bg: #14261f;
     --p3: #f0b45f;
@@ -66,7 +69,8 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 14px 16px 8px;
+    padding: 10px 16px 8px;
+    border-bottom: 1px solid var(--line);
   }
   .brand {
     display: flex;
@@ -102,8 +106,8 @@
     flex: 1 1 auto;
     display: flex;
     flex-direction: column;
-    gap: 10px;
-    padding: 2px 12px 12px;
+    gap: 8px;
+    padding: 2px 12px 10px;
     min-height: 0;
   }
   .panel {
@@ -111,15 +115,17 @@
     min-height: 0;
     background: var(--card);
     border: 1px solid var(--line);
-    border-radius: 22px;
+    border-radius: 24px;
+    box-shadow: 0 2px 10px rgba(20, 18, 12, 0.05);
     display: flex;
     flex-direction: column;
     justify-content: center;
-    padding: 8px 18px;
+    padding: 4px 18px;
     position: relative;
   }
-  .panel.p2 { background: var(--p2-bg); border-color: transparent; }
-  .panel.p3 { background: var(--p3-bg); border-color: transparent; }
+  .panel.p1 { background: var(--p1-bg); border-color: transparent; box-shadow: none; flex: 1 1 0; }
+  .panel.p2 { background: var(--p2-bg); border-color: transparent; box-shadow: none; }
+  .panel.p3 { background: var(--p3-bg); border-color: transparent; box-shadow: none; }
 
   .panel-tag {
     font-size: clamp(0.72rem, 2.6vw, 0.85rem);
@@ -189,26 +195,32 @@
   .panel.p3 .result { color: var(--p3); }
   .result.empty { opacity: 0.28; }
 
-  .panel.p1 {
-    flex: 1 1 0;
-  }
   .pergram-line {
     display: flex;
     align-items: baseline;
     justify-content: center;
     gap: 10px;
-    margin-top: 4px;
+    margin: 2px auto 0;
+    padding: 2px 18px;
+    border-radius: 100px;
+    background: var(--accent-bg-soft, rgba(15, 107, 79, 0.08));
+    width: fit-content;
   }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) .pergram-line { background: rgba(79, 214, 166, 0.12); }
+  }
+  :root[data-theme="dark"] .pergram-line { background: rgba(79, 214, 166, 0.12); }
   .pergram-label {
-    font-size: clamp(0.8rem, 3vw, 1rem);
+    font-size: clamp(0.85rem, 3.2vw, 1.1rem);
     font-weight: 600;
     letter-spacing: 0.03em;
-    color: var(--ink-soft);
+    color: var(--p2);
+    opacity: 0.75;
   }
   .pergram-value {
-    font-size: clamp(1.3rem, 6vw, 2rem);
+    font-size: clamp(2.1rem, 11vw, 3.8rem);
     font-weight: 700;
-    color: var(--ink-soft);
+    color: var(--p2);
   }
   .pergram-value.empty { opacity: 0.28; }
 </style>
