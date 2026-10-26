@@ -46,8 +46,7 @@ button:focus-visible,textarea:focus-visible{outline:2px solid var(--accent);outl
 
 <div class="bar">
   <button class="primary" id="run">Remove p in tables</button>
-  <button id="copy">Copy output</button>
-  <button id="sample">Load sample</button>
+  <button id="copy">Copy output</button>  
   <button id="clear">Clear</button>
   <span class="stat" id="stat" role="status"></span>
 </div>
@@ -59,7 +58,6 @@ button:focus-visible,textarea:focus-visible{outline:2px solid var(--accent);outl
 </main>
 
 <script>
-const SAMPLE = '<p><span>Categorical Encoding</span> is the process of converting categorical data into numerical values so that Machine Learning algorithms can use it.</p><p>Categorical data represents groups, labels, or categories rather than numerical measurements.</p><p>For example:</p><div><div><table><tbody><tr><th><p>Student</p></th><th><p>Gender</p></th><th><p>City</p></th><th><p>Result</p></th></tr><tr><td><p>A</p></td><td><p>Male</p></td><td><p>Hyderabad</p></td><td><p>Pass</p></td></tr><tr><td><p>B</p></td><td><p>Female</p></td><td><p>Chennai</p></td><td><p>Fail</p></td></tr><tr><td><p>C</p></td><td><p>Male</p></td><td><p>Delhi</p></td><td><p>Pass</p></td></tr><tr><td><p>D</p></td><td><p>Female</p></td><td><p>Hyderabad</p></td><td><p>Pass</p></td></tr></tbody></table></div></div><p>Here, <code>Gender</code>, <code>City</code>, and <code>Result</code> are categorical features.</p><p>Many Machine Learning algorithms require numerical inputs. Categorical encoding converts these categories into a suitable numerical representation.</p>';
 
 const $ = id => document.getElementById(id);
 
@@ -85,7 +83,6 @@ function run() {
 
 $('run').onclick = run;
 $('in').addEventListener('input', run);
-$('sample').onclick = () => { $('in').value = SAMPLE; run(); };
 $('clear').onclick = () => { $('in').value = ''; run(); $('stat').textContent = ''; };
 $('copy').onclick = async () => {
   const v = $('out').value;
