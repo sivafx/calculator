@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Table P Remover</title>
+<style>
+:root{--bg:#f3f5f7;--panel:#fff;--ink:#16202a;--mute:#5d6b78;--line:#d5dce3;--accent:#1d5fa8;--accent-ink:#fff;--code:#f6f8fa;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#12171c;--panel:#1b232b;--ink:#e8edf2;--mute:#93a1ae;--line:#34414d;--accent:#5aa2ea;--accent-ink:#0b1824;--code:#141b21}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 "Inter",system-ui,sans-serif}
+main{max-width:1100px;margin:0 auto;padding:24px 16px 48px}
+h1{font-size:1.5rem;margin:0 0 4px}
+.sub{color:var(--mute);margin:0 0 20px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:760px){.grid{grid-template-columns:1fr}}
+.box{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:12px;display:flex;flex-direction:column;gap:8px;min-width:0}
+.box label,.box h2{font-size:.95rem;font-weight:600;margin:0}
+textarea{width:100%;min-height:300px;resize:vertical;border:1px solid var(--line);border-radius:6px;background:var(--code);color:var(--ink);font:13px/1.5 ui-monospace,Menlo,Consolas,monospace;padding:10px}
+.bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:16px 0}
+button{font:inherit;border:1px solid var(--line);background:var(--panel);color:var(--ink);padding:8px 14px;border-radius:6px;cursor:pointer}
+button.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent);font-weight:600}
+button:focus-visible,textarea:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.stat{color:var(--mute);font-size:.9rem;margin-left:auto}
+.preview{margin-top:16px}
+.preview .render{overflow-x:auto;border:1px solid var(--line);border-radius:6px;padding:12px;background:var(--panel)}
+.render table{border-collapse:collapse;margin:8px 0}
+.render th,.render td{border:1px solid var(--line);padding:6px 10px;text-align:left}
+</style>
+</head>
+<body>
+<main>
+<h1>Table P Remover</h1>
+<p class="sub">Paste HTML. Paragraph tags inside tables are unwrapped; paragraphs everywhere else stay.</p>
+
+<div class="grid">
+  <div class="box">
+    <label for="in">Input HTML</label>
+    <textarea id="in" spellcheck="false" placeholder="Paste HTML here"></textarea>
+  </div>
+  <div class="box">
+    <label for="out">Output HTML</label>
+    <textarea id="out" spellcheck="false" readonly></textarea>
+  </div>
+</div>
+
+<div class="bar">
+  <button class="primary" id="run">Remove p in tables</button>
+  <button id="copy">Copy output</button>
+  <button id="sample">Load sample</button>
+  <button id="clear">Clear</button>
+  <span class="stat" id="stat" role="status"></span>
+</div>
+
+<div class="box preview">
+  <h2>Preview of output</h2>
+  <div class="render" id="preview"></div>
+</div>
+</main>
+
+<script>
+const SAMPLE = '<p><span>Categorical Encoding</span> is the process of converting categorical data into numerical values so that Machine Learning algorithms can use it.</p><p>Categorical data represents groups, labels, or categories rather than numerical measurements.</p><p>For example:</p><div><div><table><tbody><tr><th><p>Student</p></th><th><p>Gender</p></th><th><p>City</p></th><th><p>Result</p></th></tr><tr><td><p>A</p></td><td><p>Male</p></td><td><p>Hyderabad</p></td><td><p>Pass</p></td></tr><tr><td><p>B</p></td><td><p>Female</p></td><td><p>Chennai</p></td><td><p>Fail</p></td></tr><tr><td><p>C</p></td><td><p>Male</p></td><td><p>Delhi</p></td><td><p>Pass</p></td></tr><tr><td><p>D</p></td><td><p>Female</p></td><td><p>Hyderabad</p></td><td><p>Pass</p></td></tr></tbody></table></div></div><p>Here, <code>Gender</code>, <code>City</code>, and <code>Result</code> are categorical features.</p><p>Many Machine Learning algorithms require numerical inputs. Categorical encoding converts these categories into a suitable numerical representation.</p>';
+
+const $ = id => document.getElementById(id);
+
+function removeParagraphsInTables(html) {
+  const doc = new DOMParser().parseFromString('<body>' + html + '</body>', 'text/html');
+  const ps = [...doc.body.querySelectorAll('table p')];
+  ps.forEach(p => {
+    // unwrap: move children out, then drop the p
+    while (p.firstChild) p.parentNode.insertBefore(p.firstChild, p);
+    p.remove();
+  });
+  return { html: doc.body.innerHTML, count: ps.length };
+}
+
+function run() {
+  const src = $('in').value;
+  if (!src.trim()) { $('out').value = ''; $('preview').innerHTML = ''; $('stat').textContent = 'Paste some HTML first.'; return; }
+  const r = removeParagraphsInTables(src);
+  $('out').value = r.html;
+  $('preview').innerHTML = r.html;
+  $('stat').textContent = r.count + (r.count === 1 ? ' paragraph removed from tables' : ' paragraphs removed from tables');
+}
+
+$('run').onclick = run;
+$('in').addEventListener('input', run);
+$('sample').onclick = () => { $('in').value = SAMPLE; run(); };
+$('clear').onclick = () => { $('in').value = ''; run(); $('stat').textContent = ''; };
+$('copy').onclick = async () => {
+  const v = $('out').value;
+  if (!v) return;
+  try { await navigator.clipboard.writeText(v); }
+  catch (e) { $('out').select(); document.execCommand('copy'); }
+  $('stat').textContent = 'Copied to clipboard';
+};
+</script>
+</body>
+</html>
